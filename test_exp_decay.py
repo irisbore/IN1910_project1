@@ -1,5 +1,4 @@
 import pytest
-
 import exp_decay
 
 
