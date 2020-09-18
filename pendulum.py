@@ -1,4 +1,5 @@
 import numpy as np
+from math import radians
 
 
 class Pendulum:
@@ -31,3 +32,16 @@ class Pendulum:
 
     def __call__(self, t, y):
         return y[1], -self.g / self.L * np.sin(y[0])
+
+    def solve(self, y0, T, dt, angles=rad):
+        """"""
+        if angles == deg:
+            y0 = (radians(y0[0]), radians(y0[1]))
+        t = np.arange(0, T + dt, dt)
+        sol = solve_ivp(self.__call__, (0, T), (u0,), t_eval=t)
+        self.t = sol.t
+        self.y = sol.y.ravel()
+
+
+if __name__ == "__main__":
+    a = 2

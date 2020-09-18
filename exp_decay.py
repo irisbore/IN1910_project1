@@ -66,7 +66,7 @@ class ExponentialDecay:
         return sol.t, sol.y.ravel()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     a = 0.4
     u0 = 0.1
     T = 5
