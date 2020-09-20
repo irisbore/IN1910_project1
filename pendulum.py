@@ -77,6 +77,10 @@ class Pendulum:
     def y(self):
         return -self.L * np.cos(self.theta)
 
+    @property
+    def potential(self):
+        return self.M * self.g * (self.y + self.L)
+
 
 if __name__ == "__main__":
     p = Pendulum()

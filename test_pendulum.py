@@ -34,3 +34,9 @@ def test_radius():
     p = pendulum.Pendulum()
     p.solve([4, 2], 5, 0.01)
     assert np.all((p.x)**2 + (p.y)**2 == pytest.approx((p.L)**2))
+
+
+def test_isarray_potential():
+    p = pendulum.Pendulum()
+    p.solve([4, 2], 5, 0.01)
+    assert isinstance(p.potential, np.ndarray)
