@@ -1,6 +1,7 @@
-import pendulum
-import pytest
 import numpy as np
+import pytest
+
+import pendulum
 
 
 @pytest.mark.parametrize(
@@ -27,3 +28,9 @@ def test_equilibrium():
         and np.all(p.omega == 0)
         and (p.t == np.arange(0, 5 + 0.01, 0.01)).all()
     )
+
+
+def test_radius():
+    p = pendulum.Pendulum()
+    p.solve([4, 2], 5, 0.01)
+    assert np.all((p.x)**2 + (p.y)**2 == pytest.approx((p.L)**2))

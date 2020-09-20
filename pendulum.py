@@ -1,5 +1,6 @@
-import numpy as np
 from math import radians
+
+import numpy as np
 from scipy.integrate import solve_ivp
 
 
@@ -68,7 +69,17 @@ class Pendulum:
         except:
             print("Something went wrong")
 
+    @property
+    def x(self):
+        return self.L * np.sin(self.theta)
+
+    @property
+    def y(self):
+        return -self.L * np.cos(self.theta)
+
 
 if __name__ == "__main__":
     p = Pendulum()
+    p.solve([0, 0], 5, 0.01)
     p.t
+    p.x
