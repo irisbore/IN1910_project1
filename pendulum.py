@@ -96,8 +96,12 @@ class Pendulum:
 
 
 class DampenedPendulum(Pendulum):
-    def __init__(self, B):
+    def __init__(self, B, L=1, M=1, g=9.81):
         self.B = B
+        super().__init__(L, M, g)
+
+    def __call__(self, t, y):
+        return y[1], -self.g / self.L * np.sin(y[0]) - self.B / self.M * y[1]
 
 
 if __name__ == "__main__":
@@ -106,4 +110,8 @@ if __name__ == "__main__":
     plt.plot(
         p.t, p.theta, p.t, p.potential, p.t, p.kinetic, p.t, p.potential + p.kinetic
     )
+    plt.show()
+    d = DampenedPendulum(2)
+    d.solve([np.pi / 6, 2], 5, 0.01)
+    plt.plot(d.t, d.kinetic + d.potential)
     plt.show()
