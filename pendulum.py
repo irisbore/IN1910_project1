@@ -1,6 +1,7 @@
 from math import radians
 
 import numpy as np
+import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
 
@@ -91,11 +92,18 @@ class Pendulum:
 
     @property
     def kinetic(self):
-        return 1 / 2 * self.M * (self.vx**2 + self.vy**2)
+        return 0.5 * self.M * (self.vx ** 2 + self.vy ** 2)
+
+
+class DampenedPendulum(Pendulum):
+    def __init__(self, B):
+        self.B = B
 
 
 if __name__ == "__main__":
     p = Pendulum()
-    p.solve([4, 5], 5, 0.01)
-    p.t
-    print(p.kinetic)
+    p.solve([np.pi / 6, 2], 5, 0.01)
+    plt.plot(
+        p.t, p.theta, p.t, p.potential, p.t, p.kinetic, p.t, p.potential + p.kinetic
+    )
+    plt.show()
