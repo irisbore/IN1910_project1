@@ -81,9 +81,21 @@ class Pendulum:
     def potential(self):
         return self.M * self.g * (self.y + self.L)
 
+    @property
+    def vx(self):
+        return np.gradient(self.x, self.t)
+
+    @property
+    def vy(self):
+        return np.gradient(self.y, self.t)
+
+    @property
+    def kinetic(self):
+        return 1 / 2 * self.M * (self.vx**2 + self.vy**2)
+
 
 if __name__ == "__main__":
     p = Pendulum()
-    p.solve([0, 0], 5, 0.01)
+    p.solve([4, 5], 5, 0.01)
     p.t
-    p.x
+    print(p.kinetic)
