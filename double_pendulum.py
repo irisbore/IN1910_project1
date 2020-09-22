@@ -1,7 +1,10 @@
+from math import radians
+
+import matplotlib.pyplot as plt
 import numpy as np
+from scipy.integrate import solve_ivp
 
 from pendulum import Pendulum
-from math import radians
 
 
 class DoublePendulum:
@@ -18,8 +21,10 @@ class DoublePendulum:
             * (omega1) ** 2
             * np.sin(self._delta(theta1, theta2))
             * np.cos(self._delta(theta1, theta2))
-            + self.M2 * self.G * np.sin(theta2) * np.cos(self._delta(theta1, theta2))
-            + self.M2 * self.L2 * (omega2) ** 2 * np.sin(self._delta(theta1, theta2))
+            + self.M2 * self.G * np.sin(theta2) *
+            np.cos(self._delta(theta1, theta2))
+            + self.M2 * self.L2 * (omega2) ** 2 *
+            np.sin(self._delta(theta1, theta2))
             - (self.M1 + self.M2) * self.G * np.sin(theta1)
         )
         den = (self.M1 + self.M2) * self.L1 - self.M2 * self.L1 * (
@@ -60,7 +65,8 @@ class DoublePendulum:
     def solve(self, y0, T, dt, angles="rad"):
         """"""
         if angles == "deg":
-            y0 = [radians(y0[0]), radians(y0[1]), radians(y0[2]), radians(y0[3])]
+            y0 = [radians(y0[0]), radians(y0[1]),
+                  radians(y0[2]), radians(y0[3])]
         t = np.arange(0, T + dt, dt)
         self.sol = solve_ivp(self.__call__, (0, T), y0, t_eval=t)
 
@@ -107,7 +113,39 @@ class DoublePendulum:
     def y2(self):
         return self.y1 - self.L2 * np.cos(self.theta2)
 
+    @property
+    def potential(self):
+        P1 = self.M1 * self.G * (self.y1 + self.L1)
+        P2 = self.M2 * self.G * (self.y2 + self.L1 + self.L2)
+        return P1 + P2
+
+    @property
+    def vx1(self):
+        return np.gradient(self.x1, self.t)
+
+    @property
+    def vy1(self):
+        return np.gradient(self.y1, self.t)
+
+    @property
+    def vx2(self):
+        return np.gradient(self.x2, self.t)
+
+    @property
+    def vy2(self):
+        return np.gradient(self.y2, self.t)
+
+    @property
+    def kinetic(self):
+        K1 = 0.5 * self.M1 * (self.vx1 ** 2 + self.vy1 ** 2)
+        K2 = 0.5 * self.M2 * (self.vx2 ** 2 + self.vy2 ** 2)
+        return K1 + K2
+
 
 if __name__ == "__main__":
     dp = DoublePendulum()
-    dp(0, [np.pi / 6, 2, np.pi / 6, 1])
+    dp.solve([np.pi / 6, 2, np.pi / 6, 2], 5, 0.01)
+    plt.plot(
+        dp.t, dp.potential, dp.t, dp.kinetic, dp.t, dp.potential + dp.kinetic
+    )
+    plt.show()
