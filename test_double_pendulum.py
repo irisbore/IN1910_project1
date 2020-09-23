@@ -1,49 +1,11 @@
-import test_pendulum
 import numpy as np
 import pytest
 
+from double_pendulum import DoublePendulum
 
-G = 9.81
-M1 = 1
-M2 = 1
-L1 = 1
-L2 = 1
+dp = DoublePendulum()
 omega1 = 0.15
 omega2 = 0.15
-
-
-def delta(theta1, theta2):
-    return theta2 - theta1
-
-
-def domega1_dt(M1, M2, L1, L2, theta1, theta2, omega1, omega2):
-    num = (
-        M2
-        * L1
-        * (omega1) ** 2
-        * np.sin(delta(theta1, theta2))
-        * np.cos(delta(theta1, theta2))
-        + M2 * G * np.sin(theta2) * np.cos(delta(theta1, theta2))
-        + M2 * L2 * (omega2) ** 2 * np.sin(delta(theta1, theta2))
-        - (M1 + M2) * G * np.sin(theta1)
-    )
-    den = (M1 + M2) * L1 - M2 * L1 * (np.cos(delta(theta1, theta2))) ** 2
-    return num / den
-
-
-def domega2_dt(M1, M2, L1, L2, theta1, theta2, omega1, omega2):
-    num = (
-        -M2
-        * L2
-        * omega2 ** 2
-        * np.sin(delta(theta1, theta2))
-        * np.cos(delta(theta1, theta2))
-        + (M1 + M2) * G * np.sin(theta1) * np.cos(delta(theta1, theta2))
-        - (M1 + M2) * L1 * omega1 ** 2 * np.sin(delta(theta1, theta2))
-        - (M1 + M2) * G * np.sin(theta2)
-    )
-    den = (M1 + M2) * L2 - M2 * L2 * (np.cos(delta(theta1, theta2))) ** 2
-    return num / den
 
 
 @pytest.mark.parametrize(
@@ -56,7 +18,7 @@ def domega2_dt(M1, M2, L1, L2, theta1, theta2, omega1, omega2):
     ],
 )
 def test_delta(theta1, theta2, expected):
-    assert abs(delta(theta1, theta2) - expected) < 1e-10
+    assert abs(dp._delta(theta1, theta2) - expected) < 1e-10
 
 
 @pytest.mark.parametrize(
@@ -70,7 +32,7 @@ def test_delta(theta1, theta2, expected):
 )
 def test_domega1_dt(theta1, theta2, expected):
     assert (
-        abs(domega1_dt(M1, M2, L1, L2, theta1, theta2, omega1, omega2) - expected)
+        abs(dp._domega1_dt(theta1, theta2, omega1, omega2) - expected)
         < 1e-10
     )
 
@@ -86,6 +48,25 @@ def test_domega1_dt(theta1, theta2, expected):
 )
 def test_domega2_dt(theta1, theta2, expected):
     assert (
-        abs(domega2_dt(M1, M2, L1, L2, theta1, theta2, omega1, omega2) - expected)
+        abs(dp._domega2_dt(theta1, theta2, omega1, omega2) - expected)
         < 1e-10
     )
+
+
+def test_equilibrium():
+    dp.solve([0, 0, 0, 0], 5, 0.01)
+    assert np.all(dp.theta1 == 0) and np.all(
+        dp.theta2 == 0) and np.all(dp.t == np.arange(0, 5 + 0.01, 0.01))
+
+
+def test_radius_L1():
+    dp = DoublePendulum(L1=2)
+    dp.solve([np.pi / 6, 1, np.pi / 3, 2], 5, 0.02)
+    assert np.all((dp.x1)**2 + (dp.y1)**2 == pytest.approx((dp.L1) ** 2))
+
+
+def test_radius_L2():
+    dp = DoublePendulum(L2=2)
+    dp.solve([np.pi / 6, 1, np.pi / 3, 2], 5, 0.02)
+    assert np.all((dp.x2 - dp.x1)**2 + (dp.y2 - dp.y1)**2 ==
+                  pytest.approx((dp.L2) ** 2))
