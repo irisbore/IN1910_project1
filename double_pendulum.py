@@ -21,10 +21,8 @@ class DoublePendulum:
             * (omega1) ** 2
             * np.sin(self._delta(theta1, theta2))
             * np.cos(self._delta(theta1, theta2))
-            + self.M2 * self.G * np.sin(theta2) *
-            np.cos(self._delta(theta1, theta2))
-            + self.M2 * self.L2 * (omega2) ** 2 *
-            np.sin(self._delta(theta1, theta2))
+            + self.M2 * self.G * np.sin(theta2) * np.cos(self._delta(theta1, theta2))
+            + self.M2 * self.L2 * (omega2) ** 2 * np.sin(self._delta(theta1, theta2))
             - (self.M1 + self.M2) * self.G * np.sin(theta1)
         )
         den = (self.M1 + self.M2) * self.L1 - self.M2 * self.L1 * (
@@ -65,10 +63,9 @@ class DoublePendulum:
     def solve(self, y0, T, dt, angles="rad"):
         """"""
         if angles == "deg":
-            y0 = [radians(y0[0]), radians(y0[1]),
-                  radians(y0[2]), radians(y0[3])]
+            y0 = [radians(y0[0]), radians(y0[1]), radians(y0[2]), radians(y0[3])]
         t = np.arange(0, T + dt, dt)
-        self.sol = solve_ivp(self.__call__, (0, T), y0, t_eval=t)
+        self.sol = solve_ivp(self.__call__, (0, T), y0, t_eval=t, method="Radau")
 
     @property
     def t(self):
@@ -144,8 +141,6 @@ class DoublePendulum:
 
 if __name__ == "__main__":
     dp = DoublePendulum()
-    dp.solve([np.pi / 6, 2, np.pi / 6, 2], 5, 0.01)
-    plt.plot(
-        dp.t, dp.potential, dp.t, dp.kinetic, dp.t, dp.potential + dp.kinetic
-    )
+    dp.solve([np.pi / 6, 2, np.pi / 6, 2], 5, 0.1)
+    plt.plot(dp.t, dp.potential, dp.t, dp.kinetic, dp.t, dp.potential + dp.kinetic)
     plt.show()
