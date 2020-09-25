@@ -22,10 +22,8 @@ class DoublePendulum:
             * (omega1) ** 2
             * np.sin(self._delta(theta1, theta2))
             * np.cos(self._delta(theta1, theta2))
-            + self.M2 * self.G * np.sin(theta2) *
-            np.cos(self._delta(theta1, theta2))
-            + self.M2 * self.L2 * (omega2) ** 2 *
-            np.sin(self._delta(theta1, theta2))
+            + self.M2 * self.G * np.sin(theta2) * np.cos(self._delta(theta1, theta2))
+            + self.M2 * self.L2 * (omega2) ** 2 * np.sin(self._delta(theta1, theta2))
             - (self.M1 + self.M2) * self.G * np.sin(theta1)
         )
         den = (self.M1 + self.M2) * self.L1 - self.M2 * self.L1 * (
@@ -66,12 +64,10 @@ class DoublePendulum:
     def solve(self, y0, T, dt, angles="rad"):
         """"""
         if angles == "deg":
-            y0 = [radians(y0[0]), radians(y0[1]),
-                  radians(y0[2]), radians(y0[3])]
+            y0 = [radians(y0[0]), radians(y0[1]), radians(y0[2]), radians(y0[3])]
         t = np.arange(0, T + dt, dt)
         self.dt = dt
-        self.sol = solve_ivp(self.__call__, (0, T), y0,
-                             t_eval=t, method="Radau")
+        self.sol = solve_ivp(self.__call__, (0, T), y0, t_eval=t, method="Radau")
 
     def create_animation(self):
         # Create empty figure
@@ -82,13 +78,13 @@ class DoublePendulum:
         plt.axis((-3, 3, -3, 3))
 
         # Make an "empty" plot object to be updated throughout the animation
-        self.pendulums, = plt.plot([], [], "o-", lw=2)
+        (self.pendulums,) = plt.plot([], [], "o-", lw=2)
 
         # Call FuncAnimation
         self.animation = animation.FuncAnimation(
             fig,
             self._next_frame,
-            frames=range(len(self.x1)),
+            frames=np.linspace(0, len(self.x1) - 1, 600, dtype=int),
             repeat=None,
             interval=1000 * self.dt,
             blit=True,
@@ -181,8 +177,18 @@ class DoublePendulum:
 if __name__ == "__main__":
     dp = DoublePendulum()
     dp.solve([np.pi / 6, 2, 0, 0], 10, 0.01)
-    plt.plot(dp.t, dp.potential, dp.t, dp.kinetic,
-             dp.t, dp.potential + dp.kinetic)
+    plt.plot(dp.t, dp.potential, dp.t, dp.kinetic, dp.t, dp.potential + dp.kinetic)
     dp.create_animation()
-    # dp.save_animation("example_simulation.mp4")
     plt.show()
+    # dp.save_animation("example_simulation.mp4")
+    dp.solve([np.pi / 6 + 0.2, 2, 0.5, 1], 5, 0.01)
+    plt.plot(dp.x1, dp.y1, "co", markersize=0.2, label="Inner pendulum for ic1")
+    plt.plot(dp.x2, dp.y2, "c", label="Outer pendulum for ic1")
+    dp.solve([np.pi / 6 + 0.4, 2 + 0.2, 0.7, 1.3], 5, 0.01)
+    plt.plot(dp.x1, dp.y1, "mo", markersize=0.2, label="Inner pendulum for ic2")
+    plt.plot(dp.x2, dp.y2, "m", label="Outer pendulum for ic2")
+    dp.solve([np.pi / 6 + 0.6, 2 + 0.4, 1, 1.6], 5, 0.01)
+    plt.plot(dp.x1, dp.y1, "go", markersize=0.2, label="Inner pendulum for ic3")
+    plt.plot(dp.x2, dp.y2, "g", label="Outer pendulum for ic3")
+    plt.legend()
+    plt.savefig("chaotic_pendulum.png")
