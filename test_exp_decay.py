@@ -1,4 +1,5 @@
 import pytest
+
 import exp_decay
 
 
@@ -7,6 +8,7 @@ def test_call():
 
 
 def test_solve():
+    # check if the solve-method works, or raises any error
     a, u0, T, dt = 0.4, 1, 7, 0.5
     decay_model = exp_decay.ExponentialDecay(a)
     t, u = decay_model.solve(u0, T, dt)

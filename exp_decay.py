@@ -9,6 +9,12 @@ class ExponentialDecay:
 
     ...
 
+    Parameters
+    ----------
+    a : float
+        decay constant
+
+
     Attributes
     ----------
     a : float
@@ -26,29 +32,27 @@ class ExponentialDecay:
         ...
         Parameters
         ----------
-        t: array
-            time
-        u: callable or float
-            constant
+        t : int or float
+                time
+        u : float
+                constant
 
         Returns
         -------
         float
             the derivative of u
         """
-        if callable(u):
-            return -self.a * u(t)
         return -self.a * u
 
     def solve(self, u0, T, dt):
         """
-        Solves the ODE for a given initial condition
+        Solves the ODE u'(t) = -au for a given initial condition
 
         ...
         Parameters
         ----------
-        u0:
-
+        u0: int or float
+            initial condition
         T: int or float
             time stop
         dt: int or float
@@ -61,8 +65,8 @@ class ExponentialDecay:
         array
             solution points
         """
-        t = np.arange(0, T + dt, dt)
-        sol = solve_ivp(self.__call__, (0, T), (u0,), t_eval=t)
+        t_eval = np.arange(0, T + dt, dt)
+        sol = solve_ivp(self.__call__, (0, T), (u0,), t_eval=t_eval)
         return sol.t, sol.y.ravel()
 
 
@@ -73,6 +77,5 @@ if __name__ == "__main__":
     dt = 0.1
     decay_model = ExponentialDecay(a)
     t, u = decay_model.solve(u0, T, dt)
-    print(t, u)
     plt.plot(t, u)
     plt.show()
