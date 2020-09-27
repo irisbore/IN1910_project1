@@ -1,13 +1,13 @@
 from math import radians
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
 from scipy.integrate import solve_ivp
 
 
 class Pendulum:
     """
-    Class that represents a pendulum
+      Class that represents a pendulum
 
     Parameters
     ----------
@@ -16,7 +16,7 @@ class Pendulum:
     M : int or float, optional
         mass of pendulum (default: 1)
     g : int or float, optional
-        gravity constant (default: 9.81)
+        acceleration of gravity (default: 9.81)
 
     Attributes
     ----------
@@ -25,7 +25,25 @@ class Pendulum:
     M : int or float, optional
         mass of pendulum (default: 1)
     g : int or float, optional
-        gravity constant (default: 9.81)
+        acceleration of gravity (default: 9.81)
+    t : array
+        time array of solution
+    theta : array
+        solution for theta (position) for each value in t
+    omega : array
+        solution for omega for each value in t
+    x : array
+        x coordinate of pendulum for each value in time
+    y : array
+        y coordinate of pendulum for each value in time
+    potential : array
+        potential enrgy of pendulum for each value in time
+    vx : array
+        the gradient of x for each value in time
+    vy : array
+        the gradient of y for each value in time
+    kinetic : array
+        kinetic energy of pendulum for each value in time
     """
 
     def __init__(self, L=1, M=1, g=9.81):
@@ -34,19 +52,58 @@ class Pendulum:
         self.g = g
 
     def __call__(self, t, y):
+        """
+        Returns the RHS of the system of equations
+
+        ...
+        Parameters
+        ----------
+        t : int or float
+                time
+        y : 2-tuple (float, float)
+            theta - the angle, omega - the angular velocity
+
+
+        Returns
+        -------
+        2-tuple (float, float)
+            the derivative of theta, the derivative of omega
+        """
         return y[1], -self.g / self.L * np.sin(y[0])
 
     def solve(self, y0, T, dt, angles="rad"):
-        """"""
+        """
+        Solves the ODE for a given initial condition and time (0, T], and stores the solution
+
+        ...
+        Parameters
+        ----------
+        y0: array_like, (float, float)
+            initial condition with (theta, omega)
+        T: int or float
+            time stop, upper time where solver evaluates
+        dt: int or float
+            time steps the solver should evaluate
+        angels: string, optional
+            "rad" (default): the initial conditions are given in radians
+            "deg": the initial conditions are given in degrees
+
+        Returns
+        -------
+        array
+            timepoints
+        array
+            solution points
+        """
         if angles == "deg":
-            y0 = [radians(y0[0]), radians(y0[1])]
+            y0 = np.radians(y0)
         t = np.arange(0, T + dt, dt)
-        self.sol = solve_ivp(self.__call__, (0, T), y0, t_eval=t)
+        self._sol = solve_ivp(self.__call__, (0, T), y0, t_eval=t)
 
     @property
     def t(self):
         try:
-            return self.sol.t
+            return self._sol.t
         except AttributeError:
             raise AttributeError("You need to call solve")
         except:
@@ -55,7 +112,7 @@ class Pendulum:
     @property
     def theta(self):
         try:
-            return self.sol.y[0]
+            return self._sol.y[0]
         except AttributeError:
             raise AttributeError("You need to call solve")
         except:
@@ -64,7 +121,7 @@ class Pendulum:
     @property
     def omega(self):
         try:
-            return self.sol.y[1]
+            return self._sol.y[1]
         except AttributeError:
             raise AttributeError("You need to call solve")
         except:
@@ -99,10 +156,29 @@ class DampenedPendulum(Pendulum):
     """
     Subclass that represents the damping of a Pendulum
 
+    ...
+
     Parameters
     ----------
     B = int or float, optional
-        damping parameter
+        dampening parameter - how fast the system loses energy
+    L : int or float, optional
+        length of rod (default: 1)
+    M : int or float, optional
+        mass of pendulum (default: 1)
+    g : int or float, optional
+        acceleration of gravity (default: 9.81)
+
+    Attributes
+    ----------
+    B = int or float, optional
+        dampening parameter - how fast the system loses energy
+    L : int or float, optional
+        length of rod (default: 1)
+    M : int or float, optional
+        mass of pendulum (default: 1)
+    g : int or float, optional
+        acceleration of gravity (default: 9.81)
     """
 
     def __init__(self, B, L=1, M=1, g=9.81):
@@ -110,6 +186,23 @@ class DampenedPendulum(Pendulum):
         super().__init__(L, M, g)
 
     def __call__(self, t, y):
+        """
+        Returns the RHS of the system of equations
+
+        ...
+        Parameters
+        ----------
+        t : int or float
+                time
+        y : 2-tuple (float, float)
+            theta - the angle, omega - the angular velocity
+
+
+        Returns
+        -------
+        2-tuple (float, float)
+            the derivative of theta, the derivative of omega
+        """
         return y[1], -self.g / self.L * np.sin(y[0]) - self.B / self.M * y[1]
 
 
