@@ -87,13 +87,6 @@ class Pendulum:
         angels: string, optional
             "rad" (default): the initial conditions are given in radians
             "deg": the initial conditions are given in degrees
-
-        Returns
-        -------
-        array
-            timepoints
-        array
-            solution points
         """
         if angles == "deg":
             y0 = np.radians(y0)
