@@ -9,6 +9,37 @@ from pendulum import Pendulum
 
 
 class DoublePendulum:
+    """
+    Class that represents a double pendulum
+
+    Parameters
+    ----------
+    L1 : int or float, optional
+        length of rod 1 (default: 1)
+    L2: int or float, optional
+        length of rod 2 (default: 1)
+    M1 : int or float, optional
+        mass of pendulum 1 (default: 1)
+    M2 : int or float, optional
+        mass of pendulum 2 (default: 1)
+    G : int or float, optional
+        gravity constant (default: 9.81)
+
+    Attributes
+    ----------
+    L1 : int or float, optional
+        length of rod 1 (default: 1)
+    L2: int or float, optional
+        length of rod 2 (default: 1)
+    M1 : int or float, optional
+        mass of pendulum 1 (default: 1)
+    M2 : int or float, optional
+        mass of pendulum 2 (default: 1)
+    G : int or float, optional
+        gravity constant (default: 9.81)
+
+    """
+
     def __init__(self, M1=1, M2=1, L1=1, L2=1, G=9.81):
         self.M1, self.M2, self.L1, self.L2, self.G = M1, M2, L1, L2, G
 
@@ -174,21 +205,28 @@ class DoublePendulum:
         return K1 + K2
 
 
+def labels():
+    plt.xlabel("x")
+    plt.ylabel("y")
+
+
 if __name__ == "__main__":
     dp = DoublePendulum()
     dp.solve([np.pi / 6, 2, 0, 0], 10, 0.01)
     plt.plot(dp.t, dp.potential, dp.t, dp.kinetic, dp.t, dp.potential + dp.kinetic)
     dp.create_animation()
+    labels()
     plt.show()
     # dp.save_animation("example_simulation.mp4")
     dp.solve([np.pi / 6 + 0.2, 2, 0.5, 1], 5, 0.01)
     plt.plot(dp.x1, dp.y1, "co", markersize=0.2, label="Inner pendulum for ic1")
     plt.plot(dp.x2, dp.y2, "c", label="Outer pendulum for ic1")
     dp.solve([np.pi / 6 + 0.4, 2 + 0.2, 0.7, 1.3], 5, 0.01)
-    plt.plot(dp.x1, dp.y1, "mo", markersize=0.2, label="Inner pendulum for ic2")
-    plt.plot(dp.x2, dp.y2, "m", label="Outer pendulum for ic2")
+    plt.plot(dp.x1, dp.y1, "yo", markersize=0.2, label="Inner pendulum for ic2")
+    plt.plot(dp.x2, dp.y2, "y", label="Outer pendulum for ic2")
     dp.solve([np.pi / 6 + 0.6, 2 + 0.4, 1, 1.6], 5, 0.01)
     plt.plot(dp.x1, dp.y1, "go", markersize=0.2, label="Inner pendulum for ic3")
     plt.plot(dp.x2, dp.y2, "g", label="Outer pendulum for ic3")
     plt.legend()
+    labels()
     plt.savefig("chaotic_pendulum.png")

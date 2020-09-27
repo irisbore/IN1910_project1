@@ -96,6 +96,15 @@ class Pendulum:
 
 
 class DampenedPendulum(Pendulum):
+    """
+    Subclass that represents the damping of a Pendulum
+
+    Parameters
+    ----------
+    B = int or float, optional
+        damping parameter
+    """
+
     def __init__(self, B, L=1, M=1, g=9.81):
         self.B = B
         super().__init__(L, M, g)
@@ -110,6 +119,8 @@ if __name__ == "__main__":
     plt.plot(
         p.t, p.theta, p.t, p.potential, p.t, p.kinetic, p.t, p.potential + p.kinetic
     )
+    plt.xlabel("x")
+    plt.ylabel("y")
     plt.show()
     d = DampenedPendulum(2)
     d.solve([np.pi / 6, 2], 5, 0.01)
