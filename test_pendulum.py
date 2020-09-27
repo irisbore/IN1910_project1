@@ -13,11 +13,12 @@ def test_call(arg, expected_output):
     assert p(t=0, y=arg) == pytest.approx(expected_output)
 
 
-@pytest.mark.parametrize("arg", ["t", "theta", "omega"])
-def test_property(arg):
+def test_property():
     p = pendulum.Pendulum()
     with pytest.raises(AttributeError):
-        p.eval(arg)
+        p.t
+        p.theta
+        p.omega
 
 
 def test_equilibrium():
